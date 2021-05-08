@@ -84,3 +84,37 @@ resource "oci_core_network_security_group_security_rule" "ssh" {
     }
   }
 }
+
+resource "oci_core_network_security_group_security_rule" "ipfs_tcp" {
+  network_security_group_id = oci_core_network_security_group.free.id
+
+  direction = "INGRESS"
+  protocol  = 6 # TCP
+
+  source      = "0.0.0.0/0"
+  source_type = "CIDR_BLOCK"
+
+  tcp_options {
+    destination_port_range {
+      min = 4001
+      max = 4001
+    }
+  }
+}
+
+resource "oci_core_network_security_group_security_rule" "ipfs_udp" {
+  network_security_group_id = oci_core_network_security_group.free.id
+
+  direction = "INGRESS"
+  protocol  = 17 # UDP
+
+  source      = "0.0.0.0/0"
+  source_type = "CIDR_BLOCK"
+
+  udp_options {
+    destination_port_range {
+      min = 4001
+      max = 4001
+    }
+  }
+}
