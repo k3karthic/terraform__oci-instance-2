@@ -13,6 +13,10 @@ variable "subnet_id" {}
 variable "image_id" {}
 variable "image_os" {}
 
+variable "shape" {}
+variable "flex_memory_in_gbs" {}
+variable "flex_ocpus" {}
+
 variable "ydns_host" {}
 
 /*
@@ -20,6 +24,26 @@ variable "ydns_host" {}
  */
 
 provider "oci" {}
+
+/*
+ * Fetch Shape Configurations
+ */
+
+data "oci_core_shapes" "ad1" {
+  compartment_id      = var.compartment
+  availability_domain = var.ad
+}
+
+locals {
+  shapes_config = {
+    for i in data.oci_core_shapes.ad1.shapes : i.name => {
+      "memory_in_gbs" = i.memory_in_gbs
+      "ocpus"         = i.ocpus
+    }
+  }
+
+  shape_is_flex = length(regexall("^*.Flex", var.shape)) > 0
+}
 
 /*
  * Configuration
@@ -32,7 +56,12 @@ provider "oci" {}
 resource "oci_core_instance" "free" {
   availability_domain = var.ad
   compartment_id      = var.compartment
-  shape               = "VM.Standard.E2.1.Micro"
+  shape               = var.shape
+
+  shape_config {
+    memory_in_gbs = local.shape_is_flex == true ? var.flex_memory_in_gbs : local.shapes_config[var.shape]["memory_in_gbs"]
+    ocpus         = local.shape_is_flex == true ? var.flex_ocpus : local.shapes_config[var.shape]["ocpus"]
+  }
 
   create_vnic_details {
     hostname_label = var.hostname
