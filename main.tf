@@ -85,7 +85,6 @@ resource "oci_core_instance" "free" {
     "os"            = var.image_os
     "ydns_host"     = var.ydns_host
     "ipfs_service"  = "yes"
-    "nginx_service" = "yes"
   }
 }
 
