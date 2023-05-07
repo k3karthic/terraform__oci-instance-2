@@ -17,7 +17,6 @@ variable "shape" {}
 variable "flex_memory_in_gbs" {}
 variable "flex_ocpus" {}
 
-variable "ydns_host" {}
 variable "njalla_domain" {}
 variable "njalla_domain_id" {}
 
@@ -85,7 +84,6 @@ resource "oci_core_instance" "free" {
 
   freeform_tags = {
     "os"               = var.image_os
-    "ydns_host"        = var.ydns_host
 	"njalla_domain"    = var.njalla_domain
 	"njalla_domain_id" = var.njalla_domain_id
     "ipfs_service"     = "yes"
